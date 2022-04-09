@@ -1,0 +1,20 @@
+[
+  {
+    "UserID": 1,
+    "Name": "usr1",
+    "Email": "string1@gmail.com",
+    "Password": "string",
+    "Age": 5,
+    "NRIC": null,
+    "DOB": "20/02/2017"
+  },
+  {
+    "UserID": 2,
+    "Name": "usr2",
+    "Email": "string2@gmail.com",
+    "Password": "string",
+    "Age": 25,
+    "NRIC": "000808104455",
+    "DOB": "08/08/2000"
+  }
+]
