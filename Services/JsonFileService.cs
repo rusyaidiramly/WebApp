@@ -7,13 +7,13 @@ namespace RestAPI.Services
 {
     public class JsonFileService
     {
-        private static IWebHostEnvironment HostEnv {get;set;}
+        private IWebHostEnvironment HostEnv {get;}
 
         public JsonFileService(IWebHostEnvironment env)
         {
             HostEnv = env;
         }
-        public static void SaveJsonFile<T>(List<T> Objects, string fileName) where T : new()
+        public void SaveJsonFile<T>(List<T> Objects, string fileName) where T : new()
         {
             try
             {
@@ -26,7 +26,7 @@ namespace RestAPI.Services
             }
         }
 
-        public static List<T> LoadJsonFile<T>(string fileName) where T : new()
+        public List<T> LoadJsonFile<T>(string fileName) where T : new()
         {
             try
             {
