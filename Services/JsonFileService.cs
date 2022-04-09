@@ -7,11 +7,11 @@ namespace RestAPI.Services
 {
     public class JsonFileService
     {
-        private IWebHostEnvironment HostEnv {get;}
+        private IWebHostEnvironment HostEnv { get; }
 
-        public JsonFileService(IWebHostEnvironment env)
+        public JsonFileService(IWebHostEnvironment webHostEnvironment)
         {
-            HostEnv = env;
+            HostEnv = webHostEnvironment;
         }
         public void SaveJsonFile<T>(List<T> Objects, string fileName) where T : new()
         {
@@ -19,6 +19,7 @@ namespace RestAPI.Services
             {
                 string jsonObj = JsonConvert.SerializeObject(Objects, Formatting.Indented);
                 File.WriteAllText(Path.Combine(HostEnv.WebRootPath, "data", fileName), jsonObj);
+                // File.WriteAllText($"data/{fileName}", jsonObj);
             }
             catch (System.Exception)
             {
@@ -31,6 +32,7 @@ namespace RestAPI.Services
             try
             {
                 StreamReader sr = new StreamReader(Path.Combine(HostEnv.WebRootPath, "data", fileName));
+                // StreamReader sr = new StreamReader($"data/{fileName}");
                 string jsonString = sr.ReadToEnd();
                 sr.Close();
 
