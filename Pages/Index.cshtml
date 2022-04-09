@@ -6,12 +6,21 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Hi MOM!</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Return To Monke</h1>
+    <p>I assume you are human. Is it really worth it?</p>
 </div>
 
 
-@foreach (User usr in Model.Users)
+@* @foreach (User usr in Model.Users)
 {
     <h2>@usr.Name</h2>
+} *@
+<ul class="d-flex flex-wrap no-bullets">
+@foreach (Monkey monke in Model.Monkeys)
+{
+    <li id="monke-img" class="flex-grow-1" style="height: 38vh; padding: 0.4rem;">
+        <img src="@monke.ImageUrl" alt="@monke.Name" class="mh-100"
+        style="min-width: 100%; object-fit: cover; vertical-align: bottom;">
+    </li>
 }
+</ul>

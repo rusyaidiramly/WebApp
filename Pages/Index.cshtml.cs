@@ -16,6 +16,8 @@ namespace WebApp.Pages
         public JsonFileService jsonService;
 
         public List<User> Users { get; set; }
+        public List<Monkey> Monkeys { get; set; }
+        public string[] Cats { get; set; }
 
         public IndexModel(ILogger<IndexModel> logger, JsonFileService json)
         {
@@ -26,6 +28,8 @@ namespace WebApp.Pages
         public void OnGet()
         {
             Users = jsonService.LoadJsonFile<User>("UserList.json");
+            Monkeys = jsonService.LoadJsonFile<Monkey>("monkeys.json");
+            Cats = System.IO.File.ReadAllLines("wwwroot/data/cats.txt");
         }
     }
 }
