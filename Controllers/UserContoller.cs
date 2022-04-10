@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using RestAPI.Models;
-using RestAPI.Services;
+using WebApp.Models;
+using WebApp.Services;
+using MySql.Data.MySqlClient;
+using System.Threading.Tasks;
 
 namespace RestAPI.Controllers
 {
@@ -12,19 +14,36 @@ namespace RestAPI.Controllers
     public class UserController : ControllerBase
     {
         public static readonly string fileName = "UserList.json";
-        private List<User> Users;
         public JsonFileService _jsonService;
+        private MySqlDatabase _mySqlDatabase { get; set; }
+        private List<User> Users;
 
-        public UserController(JsonFileService jsonService)
+        public UserController(JsonFileService jsonService, MySqlDatabase mySqlDatabase)
         {
             _jsonService = jsonService;
-            Users = _jsonService.LoadJsonFile<User>(fileName);
+            // Users = _jsonService.LoadJsonFile<User>(fileName);
+            _mySqlDatabase = mySqlDatabase;
         }
 
 
         [HttpGet]
-        public IEnumerable<User> Get()
+        public async Task<IEnumerable<User>> Get()
         {
+            Users = new List<User>();
+            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT * FROM users";
+
+            using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    User t = new()
+                    {
+                        UserID = Convert.ToInt32(reader.GetFieldValue<UInt64>(0)),
+                        Email = reader.GetFieldValue<string>(1)
+                    };
+
+                    Users.Add(t);
+                }
             return Users;
         }
 
