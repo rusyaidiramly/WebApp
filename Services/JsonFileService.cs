@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 
-namespace RestAPI.Services
+namespace WebApp.Services
 {
     public class JsonFileService
     {

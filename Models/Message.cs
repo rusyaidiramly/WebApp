@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics;
 
-namespace RestAPI.Models
+namespace WebApp.Models
 {
     public class Message
     {

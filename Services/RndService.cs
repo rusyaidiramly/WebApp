@@ -1,7 +1,7 @@
 using System.Text;
 using System.Security.Cryptography;
 
-namespace RestAPI.Services
+namespace WebApp.Services
 {
     public static class RndService
     {

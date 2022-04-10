@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Globalization;
 
-namespace RestAPI.Models
+namespace WebApp.Models
 {
     public class User
     {

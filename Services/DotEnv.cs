@@ -1,8 +1,8 @@
-namespace WebApp
-{
-    using System;
-    using System.IO;
+using System;
+using System.IO;
 
+namespace WebApp.Services
+{
     public static class DotEnv
     {
         public static void Load(string filePath)

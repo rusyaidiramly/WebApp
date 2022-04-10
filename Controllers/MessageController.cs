@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
-using RestAPI.Models;
-using RestAPI.Services;
+using WebApp.Models;
+using WebApp.Services;
 
 namespace RestAPI.Controllers
 {
