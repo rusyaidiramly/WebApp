@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RestAPI.Services;
+using WebApp.Services;
 
 namespace WebApp
 {
@@ -26,6 +26,13 @@ namespace WebApp
         {
             services.AddRazorPages();
             services.AddTransient<JsonFileService>();
+            services.AddTransient<MySqlDatabase>(_ =>
+                new MySqlDatabase(
+                    $"server={Configuration["DB_HOST"]};"
+                    + $"database={Configuration["DB_DATABASE"]};"
+                    + $"uid={Configuration["DB_USERNAME"]};"
+                    + $"pwd={Configuration["DB_PASSWORD"]};"
+                    ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
