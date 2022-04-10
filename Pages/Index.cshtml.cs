@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using RestAPI.Models;
-using RestAPI.Services;
+using WebApp.Models;
+using WebApp.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;

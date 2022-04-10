@@ -1,6 +1,6 @@
 ﻿@page
 @model IndexModel
-@using RestAPI.Models
+@using WebApp.Models
 @{
     ViewData["Title"] = "Home page";
 }
@@ -15,12 +15,12 @@
 {
     <h2>@usr.Name</h2>
 } *@
-<ul class="d-flex flex-wrap no-bullets">
+<ul class="d-flex flex-wrap no-bullets" style="gap: .8rem;">
 @foreach (Monkey monke in Model.Monkeys)
 {
-    <li id="monke-img" class="flex-grow-1" style="height: 38vh; padding: 0.4rem;">
+    <li id="monke-img" class="flex-grow-1" style="height: 37vh;">
         <img src="@monke.ImageUrl" alt="@monke.Name" class="mh-100"
-        style="min-width: 100%; object-fit: cover; vertical-align: bottom;">
+        style="min-width: 100%; object-fit: cover; object-position: 0% 10%; vertical-align: bottom;">
     </li>
 }
 </ul>
