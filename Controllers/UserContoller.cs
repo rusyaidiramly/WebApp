@@ -65,6 +65,8 @@ namespace RestAPI.Controllers
                         Email = reader.GetFieldValue<string>(1),
                         Password = reader.GetFieldValue<string>(2),
                         Name = reader.GetFieldValue<string>(3),
+                        NRIC = DBHelper.ConvertFromDBVal<string>(reader.GetFieldValue<dynamic>(4)),
+                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader.GetFieldValue<dynamic>(5)),
                     };
                 }
 
