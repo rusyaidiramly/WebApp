@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApp.Services;
+using Microsoft.AspNetCore.Http;
 
 namespace WebApp
 {
@@ -61,6 +62,11 @@ namespace WebApp
             {
                 endpoints.MapRazorPages();
                 endpoints.MapControllers();
+                endpoints.MapGet("/check", async context =>
+                {
+                    await context.Response.WriteAsync("Worker Process Name : " +
+                        System.Diagnostics.Process.GetCurrentProcess().ProcessName);
+                });
             });
         }
     }
