@@ -19,7 +19,7 @@ namespace WebApp.Models
             set { _nric = value; if (_nric != null) ExtractDOB(); }
         }
 
-        public string DOB
+        public dynamic DOB
         {
             get { return _dob.ToString("dd/MM/yyyy"); }
             set { ConvertDOB(value); }
@@ -54,6 +54,14 @@ namespace WebApp.Models
             if (dd == -1 || mm == -1 || yy == -1) return;
 
             _dob = new DateTime(yy, mm, dd);
+
+            CalculateAge();
+        }
+
+        private void ConvertDOB(DateTime sDOB)
+        {
+            if (sDOB == DateTime.MinValue) return;
+            _dob = sDOB;
 
             CalculateAge();
         }

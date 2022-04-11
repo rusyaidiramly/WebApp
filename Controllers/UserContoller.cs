@@ -37,10 +37,12 @@ namespace RestAPI.Controllers
                 {
                     Users.Add(new User()
                     {
-                        UserID = Convert.ToInt32(reader.GetFieldValue<UInt64>(0)),
-                        Email = reader.GetFieldValue<string>(1),
-                        Password = reader.GetFieldValue<string>(2),
-                        Name = reader.GetFieldValue<string>(3),
+                        UserID = Convert.ToInt32(reader.GetFieldValue<dynamic>(0)),
+                        Email = reader.GetFieldValue<dynamic>(1),
+                        Password = reader.GetFieldValue<dynamic>(2),
+                        Name = reader.GetFieldValue<dynamic>(3),
+                        NRIC = DBHelper.ConvertFromDBVal<string>(reader.GetFieldValue<dynamic>(4)),
+                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader.GetFieldValue<dynamic>(5)),
                     });
                 }
 
@@ -67,6 +69,28 @@ namespace RestAPI.Controllers
                 }
 
             return SelectedUser;
+        }
+
+        [HttpGet("search")]
+        public async Task<IEnumerable<User>> Get(string q)
+        {
+            var Users = new List<User>();
+            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
+            cmd.CommandText = @"SELECT * FROM users WHERE name LIKE '%" + q + "%' OR email LIKE '%" + q + "%'";
+
+            using (var reader = await cmd.ExecuteReaderAsync())
+                while (await reader.ReadAsync())
+                {
+                    Users.Add(new User()
+                    {
+                        UserID = Convert.ToInt32(reader.GetFieldValue<UInt64>(0)),
+                        Email = reader.GetFieldValue<string>(1),
+                        Password = reader.GetFieldValue<string>(2),
+                        Name = reader.GetFieldValue<string>(3),
+                    });
+                }
+
+            return Users;
         }
         /*
                 [HttpPost]
