@@ -15,12 +15,11 @@
 {
     <h2>@usr.Name</h2>
 } *@
-<ul class="d-flex flex-wrap no-bullets" style="gap: .8rem;">
+<ul class="monke-img-container">
 @foreach (Monkey monke in Model.Monkeys)
 {
-    <li id="monke-img" class="flex-grow-1" style="height: 37vh;">
-        <img src="@monke.ImageUrl" alt="@monke.Name" class="mh-100"
-        style="min-width: 100%; object-fit: cover; object-position: 0% 10%; vertical-align: bottom;">
+    <li class="monke-img">
+        <img src="@monke.ImageUrl" alt="@monke.Name" class="mh-100">
         <div class="monkey-name">@monke.Name</div>
     </li>
 }
