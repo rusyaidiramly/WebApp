@@ -85,6 +85,7 @@ body {
     height: 37vh;
     position: relative;
     flex-grow: 1;
+    background-color: rgba(23, 23, 23, 1);
 }
 
 .monke-img:last-child {
@@ -102,7 +103,7 @@ body {
     color: #eee;
     text-align: center;
     vertical-align: middle;
-    background-color: rgba(23, 23, 23, 0.7);
+    background-color: inherit;
     position: absolute;
     bottom: 0%;
     width: 100%;
