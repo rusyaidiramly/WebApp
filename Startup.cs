@@ -25,6 +25,7 @@ namespace WebApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddRazorPages();
+            services.AddControllers();
             services.AddTransient<JsonFileService>();
             services.AddTransient<MySqlDatabase>(_ =>
                 new MySqlDatabase(
