@@ -87,7 +87,7 @@ namespace RestAPI.Controllers
                 {
                     Users.Add(new User()
                     {
-                        UserID = DBHelper.ConvertFromDBVal<int>(reader["id"]),
+                        UserID = Convert.ToInt32(reader["id"]),
                         Email = DBHelper.ConvertFromDBVal<string>(reader["email"]),
                         Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
                         Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
