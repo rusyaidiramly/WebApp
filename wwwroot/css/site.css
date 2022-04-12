@@ -73,12 +73,12 @@ body {
 
 
 .monke-img-container {
-    list-style-type: none;
     padding: 0;
     margin: 0;
     display: flex;
     flex-wrap: wrap;
     gap: 0.8rem;
+    overflow: hidden;
 }
 
 .monke-img {
@@ -101,11 +101,17 @@ body {
 
 .monkey-name {
     color: #eee;
-    text-align: center;
+    text-align: left;
     vertical-align: middle;
     background-color: inherit;
     position: absolute;
     bottom: 0%;
-    width: 100%;
     padding: 0.4rem;
+}
+
+@media only screen and (min-width: 480px) {
+    .monkey-name {
+        text-align: center;
+        width: 100%;
+    }
 }

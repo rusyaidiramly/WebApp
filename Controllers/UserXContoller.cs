@@ -6,22 +6,30 @@ using WebApp.Models;
 using WebApp.Services;
 using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
+using MySqlX.XDevAPI;
+using MySqlX.XDevAPI.Relational;
+using MySqlX.XDevAPI.Common;
+using MySqlX.XDevAPI.CRUD;
+using System.Diagnostics;
 
 namespace RestAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserXController : ControllerBase
     {
         public static readonly string fileName = "UserList.json";
         private JsonFileService _jsonService;
-        private MySqlDatabase _mySqlDatabase { get; set; }
-
-        public UserController(JsonFileService jsonService, MySqlDatabase mySqlDatabase)
+        private MySqlDatabase _mySqlDatabase { get; set; } //old way
+        private dbSession _dbSession { get; set; } //new way
+        private Table _table { get; set; }
+        public UserXController(JsonFileService jS, MySqlDatabase mysqlS, dbSession dbS)
         {
-            _jsonService = jsonService;
+            _jsonService = jS;
+            _mySqlDatabase = mysqlS;
+            _dbSession = dbS;
+            _table = _dbSession._schema.GetTable("Users");
             // Users = _jsonService.LoadJsonFile<User>(fileName);
-            _mySqlDatabase = mySqlDatabase;
         }
 
 
@@ -29,22 +37,23 @@ namespace RestAPI.Controllers
         public async Task<IEnumerable<User>> Get()
         {
             var Users = new List<User>();
-            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM users;";
+            var query = _table.Select("id,email,password,name,nric,dob");
 
-            using (var reader = await cmd.ExecuteReaderAsync())
-                while (await reader.ReadAsync())
+            await query.ExecuteAsync().ContinueWith(t =>
+            {
+                while (t.Result.Next())
                 {
                     Users.Add(new User()
                     {
-                        UserID = Convert.ToInt32(reader["id"]),
-                        Email = DBHelper.ConvertFromDBVal<string>(reader["email"]),
-                        Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
-                        Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
-                        NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        UserID = Convert.ToInt32(t.Result.Current["id"]),
+                        Name = (string)t.Result.Current["name"],
+                        Email = (string)t.Result.Current["email"],
+                        Password = (string)t.Result.Current["password"],
+                        NRIC = (string)t.Result.Current["nric"],
+                        DOB = (DateTime)t.Result.Current["dob"],
                     });
                 }
+            });
 
             return Users;
         }
@@ -52,54 +61,55 @@ namespace RestAPI.Controllers
         [HttpGet("{id}")]
         public async Task<User> Get(int id)
         {
-            User SelectedUser = null;
-            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM users WHERE id=@id LIMIT 1;";
-            cmd.Parameters.AddWithValue("@id", id);
-
-            using (var reader = await cmd.ExecuteReaderAsync())
-                if (await reader.ReadAsync())
+            User OneUser = null;
+            var query = _table.Select("id,email,password,name,nric,dob").Where("id=:id").Bind("id", id).Limit(1);
+            await query.ExecuteAsync().ContinueWith(t =>
+            {
+                if (t.Result.Next())
                 {
-                    SelectedUser = new User()
+                    OneUser = new User()
                     {
-                        UserID = Convert.ToInt32(reader["id"]),
-                        Email = DBHelper.ConvertFromDBVal<string>(reader["email"]),
-                        Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
-                        Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
-                        NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        UserID = Convert.ToInt32(t.Result.Current["id"]),
+                        Name = (string)t.Result.Current["name"],
+                        Email = (string)t.Result.Current["email"],
+                        Password = (string)t.Result.Current["password"],
+                        NRIC = (string)t.Result.Current["nric"],
+                        DOB = (DateTime)t.Result.Current["dob"],
                     };
                 }
+            });
 
-            return SelectedUser;
+            return OneUser;
+
         }
 
         [HttpGet("search")]
         public async Task<IEnumerable<User>> Get(string q)
         {
             var Users = new List<User>();
-            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM users WHERE name LIKE '%"+q+"%' OR email LIKE '%"+q+"%'";
+            var query = _table.Select("id,email,password,name,nric,dob").Where("name LIKE :q OR email like :q").Bind("q", $"%{q}%");
 
-            using (var reader = await cmd.ExecuteReaderAsync())
-                while (await reader.ReadAsync())
+            await query.ExecuteAsync().ContinueWith(t =>
+            {
+                while (t.Result.Next())
                 {
                     Users.Add(new User()
                     {
-                        UserID = Convert.ToInt32(reader["id"]),
-                        Email = DBHelper.ConvertFromDBVal<string>(reader["email"]),
-                        Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
-                        Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
-                        NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        UserID = Convert.ToInt32(t.Result.Current["id"]),
+                        Name = (string)t.Result.Current["name"],
+                        Email = (string)t.Result.Current["email"],
+                        Password = (string)t.Result.Current["password"],
+                        NRIC = (string)t.Result.Current["nric"],
+                        DOB = (DateTime)t.Result.Current["dob"],
                     });
                 }
+            });
 
             return Users;
         }
 
         [HttpPost]
-        public void Post([FromBody] User value)
+        public async void Post([FromBody] User value)
         {
             if (value.Email == null || value.Password == null || value.Name == null) return;
             User AddedUser = new User()
@@ -110,18 +120,11 @@ namespace RestAPI.Controllers
                 NRIC = value.NRIC,
             };
             if (value.NRIC == null && value.DOB != null) AddedUser.DOB = value.DOB;
-
-            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO users(email,password,name,nric,dob)"
-                                + @"VALUES (@email,@pwd,@name,@nric,STR_TO_DATE(@dob, '%d/%m/%Y'));";
-
-            cmd.Parameters.AddWithValue("@email", AddedUser.Email);
-            cmd.Parameters.AddWithValue("@pwd", AddedUser.Password);
-            cmd.Parameters.AddWithValue("@name", AddedUser.Name);
-            cmd.Parameters.AddWithValue("@nric", AddedUser.NRIC);
-            cmd.Parameters.AddWithValue("@dob", AddedUser.DOB);
-
-            cmd.ExecuteNonQuery();
+            var query = _table.Insert("email,password,name,nric,dob")
+                            .Values(AddedUser.Email,AddedUser.Password,AddedUser.Name,AddedUser.NRIC,DateTime.Parse(AddedUser.DOB).ToString("yy-MM-dd"));
+            
+            await query.ExecuteAsync();
+            
         }
 
         [HttpPut("{id}")]

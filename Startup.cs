@@ -28,13 +28,19 @@ namespace WebApp
             services.AddRazorPages();
             services.AddControllers();
             services.AddTransient<JsonFileService>();
+            services.AddTransient<dbSession>(_ =>
+                new dbSession(
+                    //mysqlx://username:password@host:port
+                    $"mysqlx://{Configuration["DB_USERNAME_X"]}:{Configuration["DB_PASSWORD_X"]}@{Configuration["DB_HOST_X"]}:{Configuration["DB_PORT_X"]}",
+                    Configuration["DB_DATABASE_X"]
+                ));
             services.AddTransient<MySqlDatabase>(_ =>
                 new MySqlDatabase(
                     $"server={Configuration["DB_HOST"]};"
                     + $"database={Configuration["DB_DATABASE"]};"
                     + $"uid={Configuration["DB_USERNAME"]};"
                     + $"pwd={Configuration["DB_PASSWORD"]};"
-                    ));
+                ));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

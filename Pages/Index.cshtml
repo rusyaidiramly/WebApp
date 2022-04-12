@@ -15,12 +15,12 @@
 {
     <h2>@usr.Name</h2>
 } *@
-<ul class="monke-img-container">
+<div class="monke-img-container">
 @foreach (Monkey monke in Model.Monkeys)
 {
-    <li class="monke-img">
+    <div class="monke-img">
         <img src="@monke.ImageUrl" alt="@monke.Name" class="mh-100">
         <div class="monkey-name">@monke.Name</div>
-    </li>
+    </div>
 }
-</ul>
+</div>
