@@ -42,7 +42,7 @@ namespace RestAPI.Controllers
                         Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
                         Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
                         NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]).ToString("dd/MM/yyyy"),
                     });
                 }
 
@@ -67,7 +67,7 @@ namespace RestAPI.Controllers
                         Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
                         Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
                         NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]).ToString("dd/MM/yyyy"),
                     };
                 }
 
@@ -91,7 +91,7 @@ namespace RestAPI.Controllers
                         Password = DBHelper.ConvertFromDBVal<string>(reader["password"]),
                         Name = DBHelper.ConvertFromDBVal<string>(reader["name"]),
                         NRIC = DBHelper.ConvertFromDBVal<string>(reader["nric"]),
-                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]),
+                        DOB = DBHelper.ConvertFromDBVal<DateTime>(reader["dob"]).ToString("dd/MM/yyyy"),
                     });
                 }
 
