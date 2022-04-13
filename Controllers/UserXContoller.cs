@@ -28,89 +28,61 @@ namespace RestAPI.Controllers
             _jsonService = jS;
             _mySqlDatabase = mysqlS;
             _dbSession = dbS;
-            _table = _dbSession._schema.GetTable("Users");
+            _table = _dbSession._schema.GetTable("user");
             // Users = _jsonService.LoadJsonFile<User>(fileName);
+        }
+
+        private void populate(Task<RowResult> t, List<User> user)
+        {
+            while (t.Result.Next())
+            {
+                user.Add(new User()
+                {
+                    UserID = Convert.ToInt32(t.Result.Current["UserID"]),
+                    Name = (string)t.Result.Current["Name"],
+                    Email = (string)t.Result.Current["Email"],
+                    Password = (string)t.Result.Current["password"],
+                    NRIC = (string)t.Result.Current["NRIC"],
+                    DOB = ((DateTime)t.Result.Current["DOB"]).ToString("dd/MM/yyyy"),
+                });
+            }
         }
 
 
         [HttpGet]
-        public async Task<IEnumerable<User>> Get()
+        public async Task<IActionResult> Get()
         {
             var Users = new List<User>();
-            var query = _table.Select("id,email,password,name,nric,dob");
+            var query = _table.Select("UserID", "Email", "Password", "Name", "NRIC", "DOB").Limit(100);
+            await query.ExecuteAsync().ContinueWith(t => populate(t, Users));
 
-            await query.ExecuteAsync().ContinueWith(t =>
-            {
-                while (t.Result.Next())
-                {
-                    Users.Add(new User()
-                    {
-                        UserID = Convert.ToInt32(t.Result.Current["id"]),
-                        Name = (string)t.Result.Current["name"],
-                        Email = (string)t.Result.Current["email"],
-                        Password = (string)t.Result.Current["password"],
-                        NRIC = (string)t.Result.Current["nric"],
-                        DOB = (DateTime)t.Result.Current["dob"],
-                    });
-                }
-            });
-
-            return Users;
+            return (Users.Any()) ? Ok(Users) : Ok(new { message = "No user" });
         }
 
         [HttpGet("{id}")]
-        public async Task<User> Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
-            User OneUser = null;
-            var query = _table.Select("id,email,password,name,nric,dob").Where("id=:id").Bind("id", id).Limit(1);
-            await query.ExecuteAsync().ContinueWith(t =>
-            {
-                if (t.Result.Next())
-                {
-                    OneUser = new User()
-                    {
-                        UserID = Convert.ToInt32(t.Result.Current["id"]),
-                        Name = (string)t.Result.Current["name"],
-                        Email = (string)t.Result.Current["email"],
-                        Password = (string)t.Result.Current["password"],
-                        NRIC = (string)t.Result.Current["nric"],
-                        DOB = (DateTime)t.Result.Current["dob"],
-                    };
-                }
-            });
+            var OneUser = new List<User>();
+            var query = _table.Select("UserID", "Email", "Password", "Name", "NRIC", "DOB").Where("UserID=:id").Bind("id", id).Limit(1);
+            await query.ExecuteAsync().ContinueWith(t => populate(t, OneUser));
 
-            return OneUser;
-
+            return (OneUser.Any()) ? Ok(OneUser[0]) : Ok(new { message = "Not found" });
         }
 
         [HttpGet("search")]
-        public async Task<IEnumerable<User>> Get(string q)
+        public async Task<IActionResult> Get(string q)
         {
             var Users = new List<User>();
-            var query = _table.Select("id,email,password,name,nric,dob").Where("name LIKE :q OR email like :q").Bind("q", $"%{q}%");
+            var query = _table.Select("UserID", "Email", "Password", "Name", "NRIC", "DOB").Where("Name LIKE :q OR Email LIKE :q").Bind("q", $"%{q}%");
+            await query.ExecuteAsync().ContinueWith(t => populate(t, Users));
 
-            await query.ExecuteAsync().ContinueWith(t =>
-            {
-                while (t.Result.Next())
-                {
-                    Users.Add(new User()
-                    {
-                        UserID = Convert.ToInt32(t.Result.Current["id"]),
-                        Name = (string)t.Result.Current["name"],
-                        Email = (string)t.Result.Current["email"],
-                        Password = (string)t.Result.Current["password"],
-                        NRIC = (string)t.Result.Current["nric"],
-                        DOB = (DateTime)t.Result.Current["dob"],
-                    });
-                }
-            });
-
-            return Users;
+            return (Users.Any()) ? Ok(Users) : Ok(new { message = "No user" });
         }
 
         [HttpPost]
-        public async void Post([FromBody] User value)
+        public void Post([FromBody] User value)
         {
+            Console.WriteLine("Inside Post Function");
             if (value.Email == null || value.Password == null || value.Name == null) return;
             User AddedUser = new User()
             {
@@ -120,11 +92,21 @@ namespace RestAPI.Controllers
                 NRIC = value.NRIC,
             };
             if (value.NRIC == null && value.DOB != null) AddedUser.DOB = value.DOB;
-            var query = _table.Insert("email,password,name,nric,dob")
-                            .Values(AddedUser.Email,AddedUser.Password,AddedUser.Name,AddedUser.NRIC,DateTime.Parse(AddedUser.DOB).ToString("yy-MM-dd"));
-            
-            await query.ExecuteAsync();
-            
+
+            var query = _table.Insert("Email", "Password", "Name", "NRIC", "DOB")
+                            .Values(
+                                // AddedUser.Email,
+                                // AddedUser.Password,
+                                // AddedUser.Name,
+                                // AddedUser.NRIC,
+                                // WebApp.Models.User.ConvertDOBFormat(AddedUser.DOB, "yyyy-MM-dd")
+                                "email@org.com", "p#ssrwods", "Nasmid", "970808104432", "1997-07-07"
+                            );
+
+            Console.WriteLine(query.ToString());
+
+            query.Execute();
+
         }
 
         [HttpPut("{id}")]
@@ -175,12 +157,12 @@ namespace RestAPI.Controllers
         }
 
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public async Task<IActionResult> get(int id)
         {
-            var cmd = _mySqlDatabase.Connection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"DELETE FROM users WHERE id=@id;";
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.ExecuteNonQuery();
+            var query = _table.Delete().Where("id=:id").Bind("id", id).Limit(1);
+            var result = await query.ExecuteAsync();
+
+            return (result.AffectedItemsCount == 1) ? Ok(new { message = "Delete success" }) : Ok(new { message = "Delete failed" });
         }
     }
 }
