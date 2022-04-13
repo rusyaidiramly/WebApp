@@ -28,6 +28,7 @@ namespace WebApp
             services.AddRazorPages();
             services.AddControllers();
             services.AddTransient<JsonFileService>();
+            services.AddTransient<DatabaseService>();
             services.AddTransient<dbSession>(_ =>
                 new dbSession(
                     //mysqlx://username:password@host:port
