@@ -19,7 +19,7 @@ namespace WebApp.Models
             set { _nric = value; if (_nric != null) ExtractDOB(); }
         }
 
-        public dynamic DOB
+        public string DOB
         {
             get { return _dob.ToString("dd/MM/yyyy"); }
             set { ConvertDOB(value); }
@@ -37,6 +37,7 @@ namespace WebApp.Models
             if (!isNumericYear || !isNumericMonth || !isNumericDay) return;
 
             year = CultureInfo.CurrentCulture.Calendar.ToFourDigitYear(year);
+
 
             DOB = $"{day}/{month}/{year}";
         }
@@ -64,6 +65,17 @@ namespace WebApp.Models
             _dob = sDOB;
 
             CalculateAge();
+        }
+
+        public static string ConvertDOBFormat(string sDOB, string newFormat)
+        {
+            if (string.IsNullOrEmpty(sDOB)) return "Empty Input";
+            string[] dmy = Regex.Split(sDOB, @"[^\d]");
+            if (dmy.Length != 3) return "Only accept day month year delimited with single character";
+
+            var newDate = new DateTime(Convert.ToInt32(dmy[2]), Convert.ToInt32(dmy[1]), Convert.ToInt32(dmy[0]));
+            Console.WriteLine($"Date from ConvertDOBFormat: { newDate.ToString(newFormat)}");
+            return newDate.ToString(newFormat);
         }
 
         private void CalculateAge()
