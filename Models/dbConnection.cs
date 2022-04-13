@@ -7,7 +7,7 @@ using System.Data;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace WebApp.Services
+namespace WebApp.Models
 {
     public static class dbConnection
     {
