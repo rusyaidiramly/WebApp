@@ -39,39 +39,44 @@ namespace WebApp.Services
             }
         }
 
-        public async Task<List<User>> FetchAll()
+        public List<User> FetchAll()
         {
             var records = new List<User>();
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM user;";
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"SELECT * FROM user;";
 
-            using (var reader = await cmd.ExecuteReaderAsync())
-                populate(reader, records);
+                using (var reader = cmd.ExecuteReader())
+                    populate(reader, records);
+            }
+            return records;
+        }
+
+        public List<User> FetchOne(int id)
+        {
+            var records = new List<User>();
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"SELECT * FROM user WHERE UserID=@id;";
+                cmd.Parameters.AddWithValue("@id", id);
+
+                using (var reader = cmd.ExecuteReader())
+                    populate(reader, records);
+            }
 
             return records;
         }
 
-        public async Task<List<User>> FetchOne(int id)
+        public List<User> FetchMatch(string q)
         {
             var records = new List<User>();
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM user WHERE UserID=@id;";
-            cmd.Parameters.AddWithValue("@id", id);
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"SELECT * FROM user WHERE Name LIKE '%" + q + "%' OR Email LIKE '%" + q + "%';";
 
-            using (var reader = await cmd.ExecuteReaderAsync())
-                populate(reader, records);
-
-            return records;
-        }
-
-        public async Task<List<User>> FetchMatch(string q)
-        {
-            var records = new List<User>();
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"SELECT * FROM user WHERE Name LIKE '%" + q + "%' OR Email LIKE '%" + q + "%';";
-
-            using (var reader = await cmd.ExecuteReaderAsync())
-                populate(reader, records);
+                using (var reader = cmd.ExecuteReader())
+                    populate(reader, records);
+            }
 
             return records;
         }
@@ -88,6 +93,7 @@ namespace WebApp.Services
 
             User selectedUser = new User();
             List<string> fields = new List<string>();
+            int status = -1;
 
             if (value.Email != null)
             {
@@ -109,21 +115,25 @@ namespace WebApp.Services
                 selectedUser.NRIC = value.NRIC;
                 fields.Add($"NRIC='{selectedUser.NRIC}'");
             }
-            if (value.DOB != null)
+            if (value.DOB != DateTime.MinValue.ToString("dd/MM/yyyy") && value.DOB != null)
             {
                 selectedUser.DOB = value.DOB;
                 fields.Add($"DOB=STR_TO_DATE('{selectedUser.DOB}', '%d/%m/%Y')");
             }
 
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"UPDATE user SET " + String.Join(",", fields) + " WHERE UserID=@id";
-            cmd.Parameters.AddWithValue("@id", id);
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"UPDATE user SET " + String.Join(",", fields) + " WHERE UserID=@id";
+                cmd.Parameters.AddWithValue("@id", id);
+                status = cmd.ExecuteNonQuery();
+            }
 
-            return cmd.ExecuteNonQuery();
+            return status;
         }
 
         public int AddRecord([FromBody] User value)
         {
+            int status = -1;
             if (value.Email == null || value.Password == null || value.Name == null) return -1;
             User AddedUser = new User()
             {
@@ -134,25 +144,32 @@ namespace WebApp.Services
             };
             if (value.NRIC == null && value.DOB != null) AddedUser.DOB = value.DOB;
 
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"INSERT INTO user(Email,Password,Name,NRIC,DOB)"
-                                + @"VALUES (@email,@pwd,@name,@nric,STR_TO_DATE(@dob, '%d/%m/%Y'));";
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"INSERT INTO user(Email,Password,Name,NRIC,DOB)"
+                                    + @"VALUES (@email,@pwd,@name,@nric,STR_TO_DATE(@dob, '%d/%m/%Y'));";
 
-            cmd.Parameters.AddWithValue("@email", AddedUser.Email);
-            cmd.Parameters.AddWithValue("@pwd", AddedUser.Password);
-            cmd.Parameters.AddWithValue("@name", AddedUser.Name);
-            cmd.Parameters.AddWithValue("@nric", AddedUser.NRIC);
-            cmd.Parameters.AddWithValue("@dob", AddedUser.DOB);
+                cmd.Parameters.AddWithValue("@email", AddedUser.Email);
+                cmd.Parameters.AddWithValue("@pwd", AddedUser.Password);
+                cmd.Parameters.AddWithValue("@name", AddedUser.Name);
+                cmd.Parameters.AddWithValue("@nric", AddedUser.NRIC);
+                cmd.Parameters.AddWithValue("@dob", AddedUser.DOB);
+                status = cmd.ExecuteNonQuery();
+            }
 
-            return cmd.ExecuteNonQuery();
+            return status;
         }
 
         public int DeleteRecord(int id)
         {
-            var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand;
-            cmd.CommandText = @"DELETE FROM user WHERE UserID=@id;";
-            cmd.Parameters.AddWithValue("@id", id);
-            return cmd.ExecuteNonQuery();
+            int status = -1;
+            using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
+            {
+                cmd.CommandText = @"DELETE FROM user WHERE UserID=@id;";
+                cmd.Parameters.AddWithValue("@id", id);
+                status = cmd.ExecuteNonQuery();
+            }
+            return status;
         }
 
 

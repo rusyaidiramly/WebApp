@@ -1,0 +1,207 @@
+:root {
+    --clr-accent: #fe330a;
+    --clr-primary: #464646;
+    --clr-bg: white;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+p {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    color: var(--clr-primary);
+    background-color: var(--clr-bg);
+    font-family: "Segoe UI", sans-serif;
+}
+
+.container-login {
+    margin: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: min(95%, 70rem);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 20rem;
+    margin: auto;
+}
+
+.motto {
+    display: none;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.875rem;
+    line-height: 2ch;
+}
+
+.logo-img {
+    padding: 2rem 2rem 0;
+    width: 100%;
+}
+
+.card-login {
+    flex: 1;
+    font-family: "Segoe UI", sans-serif;
+    color: var(--clr-primary);
+    padding: 1rem 2rem;
+    margin: auto;
+    background: var(--clr-bg);
+    width: min(95%, 20rem);
+    max-width: 20rem;
+    position: relative;
+}
+
+.card-login::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 8.625rem);
+    box-shadow: 3px 3px 8px 0 var(--clr-primary);
+    border-radius: 0.3rem;
+    top: 0;
+    left: 0;
+    opacity: 1;
+}
+
+form {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    z-index: 2;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.form-element + .form-element {
+    margin-bottom: 1rem;
+}
+
+.form-element {
+    width: 100%;
+}
+
+.form-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    letter-spacing: 0.2ch;
+    margin: 0;
+    display: grid;
+    place-items: center;
+}
+
+.form-element > label {
+    display: block;
+}
+
+.form-element > input[type="text"],
+.form-element > input[type="email"],
+.form-element > input[type="password"],
+.form-element > input[type="button"],
+.form-element > input[type="submit"] {
+    border: none;
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 0.3rem;
+    outline: 0.1rem solid #464646;
+}
+
+.form-element > input[type="button"],
+.form-element > input[type="submit"] {
+    outline: none;
+    font-weight: bold;
+    color: var(--clr-bg);
+    width: 100%;
+}
+
+.form-element > input[type="submit"] {
+    background-color: var(--clr-accent);
+}
+
+.form-element > input[type="button"] {
+    background-color: var(--clr-primary);
+}
+
+.form-element.checkbox {
+    font-size: 0.8rem;
+}
+
+.form-element.checkbox > input[type="checkbox"] {
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+}
+
+.form-element.action {
+    display: grid;
+}
+
+.form-element.action > a {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    color: var(--clr-primary);
+    font-size: 0.8rem;
+}
+
+@media screen and (min-width: 56.25em) {
+    /* body {
+      place-items: center;
+    } */
+
+    .container-login {
+        flex-direction: row;
+        /* padding: 2rem; */
+    }
+
+    .card-login {
+        border-radius: 0.3rem;
+        box-shadow: 3px 3px 8px 0 var(--clr-primary);
+    }
+
+    .card-login::after {
+        opacity: 0;
+    }
+
+    .logo {
+        max-width: 25rem;
+    }
+
+    .motto {
+        display: block;
+    }
+}
+/* nav {
+      display: inline-flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+  } */
+/* html {
+      font-size: 200%;
+  } */
