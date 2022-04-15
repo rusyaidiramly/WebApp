@@ -22,7 +22,7 @@ namespace WebApp.Models
         public string DOB
         {
             get { return _dob.ToString("dd/MM/yyyy"); }
-            set { ConvertDOB(value); }
+            set { if (_nric != null) ConvertDOB(value); }
         }
 
         private void ExtractDOB()
@@ -74,7 +74,7 @@ namespace WebApp.Models
             if (dmy.Length != 3) return "Only accept day month year delimited with single character";
 
             var newDate = new DateTime(Convert.ToInt32(dmy[2]), Convert.ToInt32(dmy[1]), Convert.ToInt32(dmy[0]));
-            Console.WriteLine($"Date from ConvertDOBFormat: { newDate.ToString(newFormat)}");
+            Console.WriteLine($"Date from ConvertDOBFormat: {newDate.ToString(newFormat)}");
             return newDate.ToString(newFormat);
         }
 

@@ -83,12 +83,17 @@ window.onload = function () {
                     <label for="swal-input-name" style="float:left">Full name</label>
                     <input type="text" class="form-control" id="swal-input-name"  value="${userData[1].innerHTML}" placeholder="Name">
                 </div>
+                <div class="form-group mb-2">
+                    <label for="swal-input-nric" style="float:left">IC No.</label>
+                    <input type="text" class="form-control" id="swal-input-nric"  value="${userData[4].innerHTML}" placeholder="IC No.">
+                </div>
                 </form>
                 </div>`,
                 preConfirm: () => {
                     return {
                         name: document.getElementById("swal-input-name").value,
                         email: document.getElementById("swal-input-email").value,
+                        nric: document.getElementById("swal-input-nric").value
                     };
                 },
             }).then((result) => {
@@ -98,6 +103,9 @@ window.onload = function () {
                             if (data.success) {
                                 userData[1].innerHTML = result.value.name;
                                 userData[2].innerHTML = result.value.email;
+                                userData[3].innerHTML = result.value.age;
+                                userData[4].innerHTML = result.value.nric;
+                                userData[5].innerHTML = data.body.dob;
                                 Swal.fire(`Edit Saved`, "", "success");
                             }
                         }

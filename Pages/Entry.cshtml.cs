@@ -18,7 +18,7 @@ namespace WebApp.Pages
         private HttpRequestService _http;
         public User usr { get; set; }
         public User updtUser { get; set; }
-        [BindProperty] public List<User> Users { get; set; }
+        public List<User> Users { get; set; }
         public List<Monkey> Monkeys { get; set; }
         public EntryModel(DatabaseService service, JsonFileService json, HttpRequestService http)
         {
@@ -33,5 +33,7 @@ namespace WebApp.Pages
             if (q != null) url += "/search?q=" + q;
             Users = _http.Get<List<User>>(url).Result;
         }
+
+        //Put & Delete handled by javascript
     }
 }

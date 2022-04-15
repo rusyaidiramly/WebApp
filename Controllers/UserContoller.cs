@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using WebApp.Models;
 using WebApp.Services;
+using Newtonsoft.Json;
 using MySql.Data.MySqlClient;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace RestAPI.Controllers
             users = _databaseService.FetchAll();
             return (users.Any())
             ? Ok(users)
-            : NotFound(new { message = "No User" });
+            : Ok(new { message = "No User", body = users });
         }
 
         [HttpGet("{id}")]
@@ -46,7 +47,7 @@ namespace RestAPI.Controllers
 
             return (selectedUser.Any())
             ? Ok(selectedUser[0])
-            : NotFound(new { message = "Not Found" });
+            : Ok(new { message = "Not Found", success = false });
         }
 
         [HttpGet("search")]
@@ -56,7 +57,7 @@ namespace RestAPI.Controllers
             users = _databaseService.FetchMatch(q);
             return (users.Any())
             ? Ok(users)
-            : NotFound(new { message = "No User Match" });
+            : Ok(new { message = "No User Match", body = users });
         }
 
         [HttpPut("{id}")]
@@ -64,8 +65,8 @@ namespace RestAPI.Controllers
         {
             int status = _databaseService.EditRecord(id, value);
             return (status == 1)
-            ? Ok(new { message = "Edit User Success", success=true })
-            : StatusCode(400, new { message = "Edit User Failed", success=true });
+            ? Ok(new { message = "Edit User Success", body = _databaseService.FetchOne(id).First(), success = true })
+            : Ok(new { message = "Edit User Failed", success = false });
         }
 
 
@@ -74,8 +75,8 @@ namespace RestAPI.Controllers
         {
             int status = _databaseService.AddRecord(value);
             return (status == 1)
-            ? StatusCode(201, new { message = "User Added", success=true })
-            : StatusCode(400, new { message = "Add User Failed" });
+            ? Ok(new { message = "User Added", success = true })
+            : Ok(new { message = "Add User Failed" });
         }
 
         [HttpDelete("{id}")]
@@ -83,8 +84,8 @@ namespace RestAPI.Controllers
         {
             int status = _databaseService.DeleteRecord(id);
             return (status == 1)
-            ? Ok(new { message = "Delete User Success", success=true })
-            : StatusCode(400, new { message = "Delete User Failed" });
+            ? Ok(new { message = "Delete User Success", success = true })
+            : Ok(new { message = "Delete User Failed", success = false });
         }
     }
 }
