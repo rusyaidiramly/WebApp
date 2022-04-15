@@ -72,8 +72,8 @@ namespace WebApp.Services
             var records = new List<User>();
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {
-                cmd.CommandText = @"SELECT * FROM user WHERE Name LIKE '%" + q + "%' OR Email LIKE '%" + q + "%';";
-
+                cmd.CommandText = @"SELECT * FROM user WHERE Name LIKE @q OR Email LIKE @q;";
+                cmd.Parameters.AddWithValue("@q", "%"+q+"%");
                 using (var reader = cmd.ExecuteReader())
                     populate(reader, records);
             }
@@ -83,31 +83,23 @@ namespace WebApp.Services
 
         public int EditRecord(int id, [FromBody] User value)
         {
-            if (
-                value.Email == null
-                && value.Password == null
-                && value.Name == null
-                && value.NRIC == null
-                && (
-                    value.DOB == default(DateTime).ToString()
-                    || value.DOB == null
-                    )
-                ) return -1;
-
-            List<string> fields = new List<string>();
             int status = -1;
-
-            if (value.Email != null) fields.Add($"Email='{value.Email}'");
-            if (value.Password != null) fields.Add($"Password='{value.Password}'");
-            if (value.Name != null) fields.Add($"Name='{value.Name}'");
-            if (value.NRIC != null) fields.Add($"NRIC='{value.NRIC}'");
-            if (value.DOB != default(DateTime).ToString("dd/MM/yyyy") && value.DOB != null)
-                fields.Add($"DOB=STR_TO_DATE('{value.DOB}', '%d/%m/%Y')");
 
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {
-                cmd.CommandText = @"UPDATE user SET " + String.Join(",", fields) + " WHERE UserID=@id";
+                cmd.CommandText = @"UPDATE user SET Email=COALESCE(@email,Email), Password=COALESCE(@password,Password)"
+                                    + @", Name=COALESCE(@name,Name), NRIC=COALESCE(@nric,NRIC), DOB=COALESCE(@dob, DOB)"
+                                    + @" WHERE UserID=@id";
+
                 cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@email", (!string.IsNullOrEmpty(value.Email)) ? value.Email : null);
+                cmd.Parameters.AddWithValue("@password", (!string.IsNullOrEmpty(value.Password)) ? value.Password : null);
+                cmd.Parameters.AddWithValue("@name", (!string.IsNullOrEmpty(value.Name)) ? value.Name : null);
+                cmd.Parameters.AddWithValue("@nric", (!string.IsNullOrEmpty(value.NRIC)) ? value.NRIC : null);
+                cmd.Parameters.AddWithValue("@dob",
+                (!(value.DOB == default(DateTime).ToString("dd/MM/yyyy") || string.IsNullOrEmpty(value.DOB)))
+                ? User.ConvertDOBFormat(value.DOB, "yyyy-MM-dd") : null);
+
                 status = cmd.ExecuteNonQuery();
             }
 
@@ -125,7 +117,8 @@ namespace WebApp.Services
                 Name = value.Name,
                 NRIC = value.NRIC,
             };
-            if (value.NRIC == null && value.DOB != null) AddedUser.DOB = value.DOB;
+            if (value.NRIC == null && value.DOB != null)
+                AddedUser.DOB = value.DOB;
 
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {

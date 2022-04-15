@@ -163,10 +163,10 @@ window.onload = function () {
                     editUser(`/api/user/${userId}`, result.value).then(
                         (data) => {
                             if (data.success) {
-                                userData[1].innerHTML = result.value.name;
-                                userData[2].innerHTML = result.value.email;
-                                userData[3].innerHTML = result.value.age;
-                                userData[4].innerHTML = result.value.nric;
+                                userData[1].innerHTML = data.body.name;
+                                userData[2].innerHTML = data.body.email;
+                                userData[3].innerHTML = data.body.age;
+                                userData[4].innerHTML = data.body.nric;
                                 userData[5].innerHTML = data.body.dob;
                                 Swal.fire(`Edit Saved`, "", "success");
                             }
