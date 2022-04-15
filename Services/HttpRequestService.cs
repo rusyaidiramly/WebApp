@@ -9,13 +9,13 @@ namespace WebApp.Services
     public class HttpRequestService
     {
         private HttpClient httpClient = new HttpClient();
-        public async void Post<T>(string url, T model)
-        {
-            string jsonObj = JsonConvert.SerializeObject(model, Formatting.Indented);
-            StringContent content = new StringContent(jsonObj, Encoding.UTF8, "application/json");
+        // public async void Post<T>(string url, T model)
+        // {
+        //     string jsonObj = JsonConvert.SerializeObject(model, Formatting.Indented);
+        //     StringContent content = new StringContent(jsonObj, Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await httpClient.PostAsync(url, content);
-        }
+        //     HttpResponseMessage response = await httpClient.PostAsync(url, content);
+        // }
 
         public async Task<T> Get<T>(string url)
         {

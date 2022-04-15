@@ -34,9 +34,7 @@ namespace RestAPI.Controllers
         {
             List<User> users = new List<User>();
             users = _databaseService.FetchAll();
-            return (users.Any())
-            ? Ok(users)
-            : Ok(new { message = "No User", body = users });
+            return Ok(users);
         }
 
         [HttpGet("{id}")]
@@ -55,9 +53,7 @@ namespace RestAPI.Controllers
         {
             List<User> users = new List<User>();
             users = _databaseService.FetchMatch(q);
-            return (users.Any())
-            ? Ok(users)
-            : Ok(new { message = "No User Match", body = users });
+            return Ok(users);
         }
 
         [HttpPut("{id}")]

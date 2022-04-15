@@ -6,8 +6,8 @@ async function postData(url = "", data = {}) {
         cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
         credentials: "same-origin", // include, *same-origin, omit
         headers: {
-            // 'Content-Type': 'application/json'
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
+            // "Content-Type": "application/x-www-form-urlencoded",
         },
         redirect: "follow", // manual, *follow, error
         referrerPolicy: "no-referrer", // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
@@ -60,6 +60,67 @@ async function deleteUser(url = "") {
 window.onload = function () {
     editBtns = document.querySelectorAll(".action-edit");
     deleteBtns = document.querySelectorAll(".action-delete");
+    addBtn = document.getElementById("add-new-user");
+
+    addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        tbody = document.getElementById("table-body-userlist");
+        Swal.fire({
+            title: `Add user`,
+            showDenyButton: false,
+            showCancelButton: true,
+            confirmButtonText: "Save",
+            confirmButtonColor: "#198754",
+            html: `<div class="container">
+                <form>
+                <div class="form-group mb-2">
+                    <label for="swal-input-email" style="float:left">Email</label>
+                    <input type="email" class="form-control" id="swal-input-email" placeholder="Email">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="swal-input-name" style="float:left">Full name</label>
+                    <input type="text" class="form-control" id="swal-input-name" placeholder="Name">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="swal-input-nric" style="float:left">IC No.</label>
+                    <input type="text" class="form-control" id="swal-input-nric" placeholder="IC No.">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="swal-input-dob" style="float:left">Birth date</label>
+                    <input type="text" class="form-control" id="swal-input-dob" placeholder="Birth date">
+                </div>
+                <div class="form-group mb-2">
+                    <label for="swal-input-password" style="float:left">Password</label>
+                    <input type="text" class="form-control" id="swal-input-password" placeholder="Password">
+                </div>
+                </form>
+                </div>`,
+            preConfirm: () => {
+                return {
+                    name: document.getElementById("swal-input-name").value,
+                    email: document.getElementById("swal-input-email").value,
+                    nric: document.getElementById("swal-input-nric").value,
+                    dob: document.getElementById("swal-input-dob").value,
+                    password: document.getElementById("swal-input-password")
+                        .value,
+                };
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                postData(`/api/user`, result.value).then((data) => {
+                    if (data.success) {
+                        Swal.fire(data.message, "", "success").then(
+                            (result) => {
+                                if (result.isConfirmed) location.reload();
+                            }
+                        );
+                    } else {
+                        Swal.fire(data.message, "", "info");
+                    }
+                });
+            }
+        });
+    });
 
     editBtns.forEach((editBtn) => {
         editBtn.addEventListener("click", function (e) {
@@ -92,8 +153,9 @@ window.onload = function () {
                 preConfirm: () => {
                     return {
                         name: document.getElementById("swal-input-name").value,
-                        email: document.getElementById("swal-input-email").value,
-                        nric: document.getElementById("swal-input-nric").value
+                        email: document.getElementById("swal-input-email")
+                            .value,
+                        nric: document.getElementById("swal-input-nric").value,
                     };
                 },
             }).then((result) => {
@@ -146,7 +208,6 @@ window.onload = function () {
             });
         });
     });
-
 };
 
 //   postData('https://example.com/answer', { answer: 42 })

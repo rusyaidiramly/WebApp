@@ -27,13 +27,13 @@ namespace WebApp.Pages
             _http = http;
         }
 
-        public void OnGet([FromQuery(Name = "query")] string q)
+        public void OnGet([FromQuery(Name = "nameoremail")] string q)
         {
             string url = "http://192.168.43.128:5001/api/user";
             if (q != null) url += "/search?q=" + q;
             Users = _http.Get<List<User>>(url).Result;
         }
 
-        //Put & Delete handled by javascript
+        //Post, Put & Delete handled by javascript
     }
 }
