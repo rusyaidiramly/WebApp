@@ -88,38 +88,21 @@ namespace WebApp.Services
                 && value.Password == null
                 && value.Name == null
                 && value.NRIC == null
-                && value.DOB == null
+                && (
+                    value.DOB == default(DateTime).ToString()
+                    || value.DOB == null
+                    )
                 ) return -1;
 
-            User selectedUser = new User();
             List<string> fields = new List<string>();
             int status = -1;
 
-            if (value.Email != null)
-            {
-                selectedUser.Email = value.Email;
-                fields.Add($"Email='{selectedUser.Email}'");
-            }
-            if (value.Password != null)
-            {
-                selectedUser.Password = value.Password;
-                fields.Add($"Password='{selectedUser.Password}'");
-            }
-            if (value.Name != null)
-            {
-                selectedUser.Name = value.Name;
-                fields.Add($"Name='{selectedUser.Name}'");
-            }
-            if (value.NRIC != null)
-            {
-                selectedUser.NRIC = value.NRIC;
-                fields.Add($"NRIC='{selectedUser.NRIC}'");
-            }
-            if (value.DOB != DateTime.MinValue.ToString("dd/MM/yyyy") && value.DOB != null)
-            {
-                selectedUser.DOB = value.DOB;
-                fields.Add($"DOB=STR_TO_DATE('{selectedUser.DOB}', '%d/%m/%Y')");
-            }
+            if (value.Email != null) fields.Add($"Email='{value.Email}'");
+            if (value.Password != null) fields.Add($"Password='{value.Password}'");
+            if (value.Name != null) fields.Add($"Name='{value.Name}'");
+            if (value.NRIC != null) fields.Add($"NRIC='{value.NRIC}'");
+            if (value.DOB != default(DateTime).ToString("dd/MM/yyyy") && value.DOB != null)
+                fields.Add($"DOB=STR_TO_DATE('{value.DOB}', '%d/%m/%Y')");
 
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {
