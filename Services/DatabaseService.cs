@@ -57,7 +57,7 @@ namespace WebApp.Services
             var records = new List<User>();
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {
-                cmd.CommandText = @"SELECT * FROM user WHERE UserID=@id;";
+                cmd.CommandText = @"SELECT * FROM user WHERE UserID=@id LIMIT 1;";
                 cmd.Parameters.AddWithValue("@id", id);
 
                 using (var reader = cmd.ExecuteReader())
@@ -110,26 +110,17 @@ namespace WebApp.Services
         {
             int status = -1;
             if (value.Email == null || value.Password == null || value.Name == null) return -1;
-            User AddedUser = new User()
-            {
-                Email = value.Email,
-                Password = value.Password,
-                Name = value.Name,
-                NRIC = value.NRIC,
-            };
-            if (value.NRIC == null && value.DOB != null)
-                AddedUser.DOB = value.DOB;
 
             using (var cmd = dbConnection.GetConnection.CreateCommand() as MySqlCommand)
             {
                 cmd.CommandText = @"INSERT INTO user(Email,Password,Name,NRIC,DOB)"
                                     + @"VALUES (@email,@pwd,@name,@nric,STR_TO_DATE(@dob, '%d/%m/%Y'));";
 
-                cmd.Parameters.AddWithValue("@email", AddedUser.Email);
-                cmd.Parameters.AddWithValue("@pwd", AddedUser.Password);
-                cmd.Parameters.AddWithValue("@name", AddedUser.Name);
-                cmd.Parameters.AddWithValue("@nric", AddedUser.NRIC);
-                cmd.Parameters.AddWithValue("@dob", AddedUser.DOB);
+                cmd.Parameters.AddWithValue("@email", value.Email);
+                cmd.Parameters.AddWithValue("@pwd", value.Password);
+                cmd.Parameters.AddWithValue("@name", value.Name);
+                cmd.Parameters.AddWithValue("@nric", value.NRIC);
+                cmd.Parameters.AddWithValue("@dob", value.DOB);
                 status = cmd.ExecuteNonQuery();
             }
 
